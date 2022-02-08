@@ -10,3 +10,4 @@ export type Reverse<U extends string> = U extends ''
 
 export type Last<T extends string> = First<Reverse<T>>
 export type RemoveLast<T extends string> = Reverse<RemoveFirst<Reverse<T>>>
+export type StripNullChars<T extends string> = T extends `${infer U}${string}` ? U extends '\u0000' ? '' : `${U}${StripNullChars<RemoveFirst<T>>}` : T

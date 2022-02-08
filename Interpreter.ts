@@ -10,7 +10,8 @@ import {
     First,
     Last,
     RemoveFirst,
-    RemoveLast
+    RemoveLast,
+    StripNullChars
 } from './StringTypes'
 
 interface Program {
@@ -87,3 +88,14 @@ export type BfProgram<
 
 export type RunToEnd<T extends Program> = T['halt'] extends true
     ? T : RunToEnd<Next<T>>
+
+
+interface CompletedProgram extends Program {
+    halt: true
+}
+
+export type ProgramSummary<T extends CompletedProgram> = {
+    program: `${T['instrLeft']}${T['instr']}${T['instrRight']}`
+    memory: `${T['memLeft']}${T['mem']}${T['memRight']}`
+    setMemory: StripNullChars<`${T['memLeft']}${T['mem']}${T['memRight']}`>
+}
