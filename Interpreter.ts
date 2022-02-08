@@ -16,6 +16,7 @@ import {
 
 interface Program {
     halt: boolean
+    mode: 'regular' | 'loopForward' | 'loopBackward'
 
     instrLeft: string
     instr: Instr | ''
@@ -38,6 +39,7 @@ export type BfProgram<
     TStdin extends string
 > = {
     halt: false
+    mode: 'regular'
     instrLeft: ''
     instr: First<TBfCode>
     instrRight: RemoveFirst<TBfCode>
@@ -55,10 +57,10 @@ export type ProgramSummary<T extends CompletedProgram> = {
     stdout: T['stdout']
 }
 
-export type Next<T extends Program> =
-    T['halt'] extends true ? T
-    : T['instr'] extends '>' ? {
+type StepRegular<T extends Program> =
+    T['instr'] extends '>' ? {
         halt: T['instrRight'] extends '' ? true : false
+        mode: 'regular'
 
         instrLeft: `${T['instrLeft']}${T['instr']}`
         instr: First<T['instrRight']>
@@ -73,6 +75,7 @@ export type Next<T extends Program> =
     }
     : T['instr'] extends '<' ? {
         halt: T['instrRight'] extends '' ? true : false
+        mode: 'regular'
 
         instrLeft: `${T['instrLeft']}${T['instr']}`
         instr: First<T['instrRight']>
@@ -87,6 +90,7 @@ export type Next<T extends Program> =
     }
     : T['instr'] extends '+' ? {
         halt: T['instrRight'] extends '' ? true : false
+        mode: 'regular'
 
         instrLeft: `${T['instrLeft']}${T['instr']}`
         instr: First<T['instrRight']>
@@ -101,6 +105,7 @@ export type Next<T extends Program> =
     }
     : T['instr'] extends '-' ? {
         halt: T['instrRight'] extends '' ? true : false
+        mode: 'regular'
 
         instrLeft: `${T['instrLeft']}${T['instr']}`
         instr: First<T['instrRight']>
@@ -115,6 +120,7 @@ export type Next<T extends Program> =
     }
     : T['instr'] extends ',' ? {
         halt: T['instrRight'] extends '' ? true : false
+        mode: 'regular'
 
         instrLeft: `${T['instrLeft']}${T['instr']}`
         instr: First<T['instrRight']>
@@ -129,6 +135,7 @@ export type Next<T extends Program> =
     }
     : T['instr'] extends '.' ? {
         halt: T['instrRight'] extends '' ? true : false
+        mode: 'regular'
 
         instrLeft: `${T['instrLeft']}${T['instr']}`
         instr: First<T['instrRight']>
@@ -143,5 +150,13 @@ export type Next<T extends Program> =
     }
     : null
 
+type StepLoopForward<T extends Program> = T
+type StepLoopBackward<T extends Program> = T
+
+type Step<T extends Program> =
+    T['mode'] extends 'loopForward' ? StepLoopForward<T>
+    : T['mode'] extends 'loopForward' ? StepLoopBackward<T>
+    : StepRegular<T>
+
 export type RunToEnd<T extends Program> = T['halt'] extends true
-    ? T : RunToEnd<Next<T>>
+    ? T : RunToEnd<Step<T>>
