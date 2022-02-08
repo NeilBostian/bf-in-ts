@@ -57,105 +57,117 @@ export type ProgramSummary<T extends CompletedProgram> = {
     stdout: T['stdout']
 }
 
+type StepShiftRight<T extends Program> = {
+    halt: T['instrRight'] extends '' ? true : false
+    mode: 'regular'
+
+    instrLeft: `${T['instrLeft']}${T['instr']}`
+    instr: First<T['instrRight']>
+    instrRight: RemoveFirst<T['instrRight']>
+
+    memLeft: `${T['memLeft']}${T['mem']}`
+    mem: First<T['memRight']>
+    memRight: RemoveFirst<T['memRight']>
+
+    stdin: T['stdin']
+    stdout: T['stdout']
+}
+
+type StepShiftLeft<T extends Program> = {
+    halt: T['instrRight'] extends '' ? true : false
+    mode: 'regular'
+
+    instrLeft: `${T['instrLeft']}${T['instr']}`
+    instr: First<T['instrRight']>
+    instrRight: RemoveFirst<T['instrRight']>
+
+    memLeft: RemoveLast<T['memLeft']>
+    mem: Last<T['memLeft']>
+    memRight: `${T['mem']}${T['memRight']}`
+
+    stdin: T['stdin']
+    stdout: T['stdout']
+}
+
+type StepIncrement<T extends Program> = {
+    halt: T['instrRight'] extends '' ? true : false
+    mode: 'regular'
+
+    instrLeft: `${T['instrLeft']}${T['instr']}`
+    instr: First<T['instrRight']>
+    instrRight: RemoveFirst<T['instrRight']>
+
+    memLeft: T['memLeft']
+    mem: T['mem'] extends MemByte ? Increment<T['mem']> : ''
+    memRight: T['memRight']
+
+    stdin: T['stdin']
+    stdout: T['stdout']
+}
+
+type StepDecrement<T extends Program> = {
+    halt: T['instrRight'] extends '' ? true : false
+    mode: 'regular'
+
+    instrLeft: `${T['instrLeft']}${T['instr']}`
+    instr: First<T['instrRight']>
+    instrRight: RemoveFirst<T['instrRight']>
+
+    memLeft: T['memLeft']
+    mem: T['mem'] extends MemByte ? Decrement<T['mem']> : ''
+    memRight: T['memRight']
+
+    stdin: T['stdin']
+    stdout: T['stdout']
+}
+
+type StepStdin<T extends Program> = {
+    halt: T['instrRight'] extends '' ? true : false
+    mode: 'regular'
+
+    instrLeft: `${T['instrLeft']}${T['instr']}`
+    instr: First<T['instrRight']>
+    instrRight: RemoveFirst<T['instrRight']>
+
+    memLeft: T['memLeft']
+    mem: First<T['stdin']>
+    memRight: T['memRight']
+
+    stdin: RemoveFirst<T['stdin']>
+    stdout: T['stdout']
+}
+
+type StepStdout<T extends Program> = {
+    halt: T['instrRight'] extends '' ? true : false
+    mode: 'regular'
+
+    instrLeft: `${T['instrLeft']}${T['instr']}`
+    instr: First<T['instrRight']>
+    instrRight: RemoveFirst<T['instrRight']>
+
+    memLeft: T['memLeft']
+    mem: T['mem']
+    memRight: T['memRight']
+
+    stdin: T['stdin']
+    stdout: `${T['stdout']}${T['mem']}`
+}
+
 type StepRegular<T extends Program> =
-    T['instr'] extends '>' ? {
-        halt: T['instrRight'] extends '' ? true : false
-        mode: 'regular'
-
-        instrLeft: `${T['instrLeft']}${T['instr']}`
-        instr: First<T['instrRight']>
-        instrRight: RemoveFirst<T['instrRight']>
-
-        memLeft: `${T['memLeft']}${T['mem']}`
-        mem: First<T['memRight']>
-        memRight: RemoveFirst<T['memRight']>
-
-        stdin: T['stdin']
-        stdout: T['stdout']
-    }
-    : T['instr'] extends '<' ? {
-        halt: T['instrRight'] extends '' ? true : false
-        mode: 'regular'
-
-        instrLeft: `${T['instrLeft']}${T['instr']}`
-        instr: First<T['instrRight']>
-        instrRight: RemoveFirst<T['instrRight']>
-
-        memLeft: RemoveLast<T['memLeft']>
-        mem: Last<T['memLeft']>
-        memRight: `${T['mem']}${T['memRight']}`
-
-        stdin: T['stdin']
-        stdout: T['stdout']
-    }
-    : T['instr'] extends '+' ? {
-        halt: T['instrRight'] extends '' ? true : false
-        mode: 'regular'
-
-        instrLeft: `${T['instrLeft']}${T['instr']}`
-        instr: First<T['instrRight']>
-        instrRight: RemoveFirst<T['instrRight']>
-
-        memLeft: T['memLeft']
-        mem: T['mem'] extends MemByte ? Increment<T['mem']> : ''
-        memRight: T['memRight']
-
-        stdin: T['stdin']
-        stdout: T['stdout']
-    }
-    : T['instr'] extends '-' ? {
-        halt: T['instrRight'] extends '' ? true : false
-        mode: 'regular'
-
-        instrLeft: `${T['instrLeft']}${T['instr']}`
-        instr: First<T['instrRight']>
-        instrRight: RemoveFirst<T['instrRight']>
-
-        memLeft: T['memLeft']
-        mem: T['mem'] extends MemByte ? Decrement<T['mem']> : ''
-        memRight: T['memRight']
-
-        stdin: T['stdin']
-        stdout: T['stdout']
-    }
-    : T['instr'] extends ',' ? {
-        halt: T['instrRight'] extends '' ? true : false
-        mode: 'regular'
-
-        instrLeft: `${T['instrLeft']}${T['instr']}`
-        instr: First<T['instrRight']>
-        instrRight: RemoveFirst<T['instrRight']>
-
-        memLeft: T['memLeft']
-        mem: First<T['stdin']>
-        memRight: T['memRight']
-
-        stdin: RemoveFirst<T['stdin']>
-        stdout: T['stdout']
-    }
-    : T['instr'] extends '.' ? {
-        halt: T['instrRight'] extends '' ? true : false
-        mode: 'regular'
-
-        instrLeft: `${T['instrLeft']}${T['instr']}`
-        instr: First<T['instrRight']>
-        instrRight: RemoveFirst<T['instrRight']>
-
-        memLeft: T['memLeft']
-        mem: T['mem']
-        memRight: T['memRight']
-
-        stdin: T['stdin']
-        stdout: `${T['stdout']}${T['mem']}`
-    }
+    T['instr'] extends '>' ? StepShiftRight<T>
+    : T['instr'] extends '<' ? StepShiftLeft<T>
+    : T['instr'] extends '+' ? StepIncrement<T>
+    : T['instr'] extends '-' ? StepDecrement<T>
+    : T['instr'] extends ',' ? StepStdin<T>
+    : T['instr'] extends '.' ? StepStdout<T>
     : null
 
-type StepLoopForward<T extends Program> = T
-type StepLoopBackward<T extends Program> = T
+type StepLoopForward<T extends Program, TStack extends string> = T
+type StepLoopBackward<T extends Program, TStack extends string> = T
 
 type Step<T extends Program> =
-    T['mode'] extends 'loopForward' ? StepLoopForward<T>
-    : T['mode'] extends 'loopForward' ? StepLoopBackward<T>
+    T['mode'] extends 'loopForward' ? StepLoopForward<T, ''>
+    : T['mode'] extends 'loopForward' ? StepLoopBackward<T, ''>
     : StepRegular<T>
 
 export type RunToEnd<T extends Program> = T['halt'] extends true
