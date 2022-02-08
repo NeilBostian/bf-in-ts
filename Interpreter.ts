@@ -113,6 +113,34 @@ export type Next<T extends Program> =
         stdin: T['stdin']
         stdout: T['stdout']
     }
+    : T['instr'] extends ',' ? {
+        halt: T['instrRight'] extends '' ? true : false
+
+        instrLeft: `${T['instrLeft']}${T['instr']}`
+        instr: First<T['instrRight']>
+        instrRight: RemoveFirst<T['instrRight']>
+
+        memLeft: T['memLeft']
+        mem: First<T['stdin']>
+        memRight: T['memRight']
+
+        stdin: RemoveFirst<T['stdin']>
+        stdout: T['stdout']
+    }
+    : T['instr'] extends '.' ? {
+        halt: T['instrRight'] extends '' ? true : false
+
+        instrLeft: `${T['instrLeft']}${T['instr']}`
+        instr: First<T['instrRight']>
+        instrRight: RemoveFirst<T['instrRight']>
+
+        memLeft: T['memLeft']
+        mem: T['mem']
+        memRight: T['memRight']
+
+        stdin: T['stdin']
+        stdout: `${T['stdout']}${T['mem']}`
+    }
     : null
 
 export type RunToEnd<T extends Program> = T['halt'] extends true
