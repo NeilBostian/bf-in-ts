@@ -12,7 +12,11 @@ import {
     Null64,
     Null128,
     Null256,
-    Null512
+    Null512,
+    Null1024,
+    Null2048,
+    Null4096,
+    Null8192
 } from '../StringTypes'
 
 const testFirst1: First<''> = ''
@@ -49,6 +53,11 @@ let testRemoveNull64: RemoveLast<Null64>
 let testRemoveNull128: RemoveLast<Null128>
 let testRemoveNull256: RemoveLast<Null256>
 let testRemoveNull512: RemoveLast<Null512>
+let testRemoveNull1024: RemoveLast<Null1024>
+// failing with patch `instantiationDepth === (100 * 64) || instantiationCount >= (5000000 * 64)`
+//let testRemoveNull2048: RemoveLast<Null2048>
+//let testRemoveNull4096: RemoveLast<Null4096>
+//let testRemoveNull8192: RemoveLast<Null8192>
 
 const testStripNullChars1: StripTrailingNullChars<''> = ''
 const testStripNullChars2: StripTrailingNullChars<'A\0\0'> = 'A'
