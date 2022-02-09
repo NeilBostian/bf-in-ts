@@ -137,7 +137,7 @@ type StepStdin<T extends Program> = {
     instrRight: RemoveFirst<T['instrRight']>
 
     memLeft: T['memLeft']
-    mem: First<T['stdin']>
+    mem: First<T['stdin']> extends MemByte ? First<T['stdin']> : '\0'
     memRight: T['memRight']
 
     stdin: RemoveFirst<T['stdin']>
@@ -180,8 +180,8 @@ type StepOverLoop<T extends Program> = {
 }
 
 type StepJumpToLoopStart<T extends Program> = {
-    halt: T['instrRight'] extends '' ? true : false
-    mode: Last<T['instrLeft']> extends '[' ? T['stack'] extends '' ? 'regular' : 'jumpToLoop' : 'jumpToLoop'
+    halt: T['instrLeft'] extends '' ? true : false
+    mode: Last<RemoveLast<T['instrLeft']>> extends '[' ? T['stack'] extends '' ? 'regular' : 'jumpToLoop' : 'jumpToLoop'
     stack: Last<T['instrLeft']> extends ']' ? `${T['stack']}+`
         : Last<T['instrLeft']> extends '[' ? RemoveLast<T['stack']> : T['stack']
 
@@ -225,8 +225,9 @@ type StepRegular<T extends Program> =
     : T['instr'] extends ']' ? T['mem'] extends '\0' ? StepNop<T> : StepJumpToLoopStart<T>
     : null
 
-type Step<T extends Program> =
-    T['mode'] extends 'stepOverLoop' ? StepOverLoop<T>
+export type Step<T extends Program> =
+    T['halt'] extends true ? T
+    : T['mode'] extends 'stepOverLoop' ? StepOverLoop<T>
     : T['mode'] extends 'jumpToLoop' ? StepJumpToLoopStart<T>
     : StepRegular<T>
 
