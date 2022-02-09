@@ -22,4 +22,5 @@ Run tests - see [tests](./tests):
 VsCode also shows this error - you might need to explicitly set the typescript version to the workspace tsserver defined in [.vscode/settings.json](./.vscode/settings.json). See [this comment](https://github.com/microsoft/TypeScript/issues/34933#issuecomment-889570502) for more details.
 
 #### Similar work
-Shoutout to Carter who had a similar idea 👉 [github.com/sno/bf](https://github.com/sno2/bf)
+- Shoutout to Carter who had a similar idea 👉 [sno/bf](https://github.com/sno2/bf)
+- This repo has loads of cool typescript 👉 [fightingcat/sits](https://github.com/fightingcat/sits/lib)
