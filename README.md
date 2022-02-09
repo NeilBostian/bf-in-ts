@@ -1,5 +1,5 @@
 ## Brainfuck Interpreter in TypeScript's Type System
-This project is a Brainfuck (bf) interpreter written using TypeScript's type system. Take a look at [this github thread](https://github.com/Microsoft/TypeScript/issues/14833) for discussion on what the type system is capable of.
+This project is a [Brainfuck](https://en.wikipedia.org/wiki/Brainfuck) interpreter written using TypeScript's type system. Take a look at [this github thread](https://github.com/Microsoft/TypeScript/issues/14833) for discussion on what the type system is capable of.
 
 To learn more about bf, see:
 - [Basics of Brainfuck](https://gist.github.com/roachhd/dce54bec8ba55fb17d3a)
