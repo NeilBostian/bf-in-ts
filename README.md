@@ -1,3 +1,9 @@
+Clone repo, install tsc, apply patch:
+
+    $> git clone https://github.com/neilbostian/typefuck
+    $> npm i
+    $> npx patch-package
+
 Relevant:
 - [Basics of Brainfuck](https://gist.github.com/roachhd/dce54bec8ba55fb17d3a)
 - [More helpful BF resources](https://www.nayuki.io/page/brainfuck-interpreter-javascript)
