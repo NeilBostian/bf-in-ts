@@ -12,6 +12,7 @@ Clone & yarn:
     $> yarn
 
 Run tests - see [tests](./tests):
+
     $> yarn test
 
 #### Patch
