@@ -1,4 +1,5 @@
 {
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "patch-package": "^6.4.7",
     "typescript": "^4.5.5"
