@@ -2,5 +2,8 @@
   "dependencies": {
     "patch-package": "^6.4.7",
     "typescript": "^4.5.5"
+  },
+  "scripts": {
+    "tests": "node run-tests.js"
   }
 }
