@@ -4,6 +4,7 @@
     "typescript": "^4.5.5"
   },
   "scripts": {
-    "tests": "node run-tests.js"
+    "test": "node run-tests.js",
+    "postinstall": "npx patch-package"
   }
 }

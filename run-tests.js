@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require("fs");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 
@@ -16,6 +16,11 @@ fs.readdir("tests", async (err, files) => {
   }
 
   for (const i in files) {
-      await runTest(files[i])
+    try {
+      await runTest(files[i]);
+    } catch (e) {
+      console.error(e);
+      break;
+    }
   }
 });

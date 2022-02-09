@@ -1,8 +1,10 @@
-Clone repo, install tsc, apply patch:
+Clone & yarn:
 
     $> git clone https://github.com/neilbostian/typefuck
-    $> npm i
-    $> npx patch-package
+    $> yarn
+
+Run tests - see [tests](./tests):
+    $> yarn test
 
 Relevant:
 - [Basics of Brainfuck](https://gist.github.com/roachhd/dce54bec8ba55fb17d3a)
