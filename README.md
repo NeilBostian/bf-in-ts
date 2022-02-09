@@ -8,7 +8,7 @@ To learn more about bf, see:
 ## Install & Test
 Clone & yarn:
 
-    $> git clone https://github.com/neilbostian/typefuck
+    $> git clone https://github.com/neilbostian/bf-in-ts
     $> yarn
 
 Run tests - see [tests](./tests):
