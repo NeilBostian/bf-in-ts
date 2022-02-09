@@ -16,7 +16,8 @@ import {
 
 interface Program {
     halt: boolean
-    mode: 'regular' | 'loopForward' | 'loopBackward'
+    mode: 'regular' | 'stepOverLoop' | 'jumpToLoop'
+    stack: string
 
     instrLeft: string
     instr: Instr | ''
@@ -40,6 +41,7 @@ export type BfProgram<
 > = {
     halt: false
     mode: 'regular'
+    stack: ''
     instrLeft: ''
     instr: First<TBfCode>
     instrRight: RemoveFirst<TBfCode>
@@ -60,6 +62,7 @@ export type ProgramSummary<T extends CompletedProgram> = {
 type StepShiftRight<T extends Program> = {
     halt: T['instrRight'] extends '' ? true : false
     mode: 'regular'
+    stack: ''
 
     instrLeft: `${T['instrLeft']}${T['instr']}`
     instr: First<T['instrRight']>
@@ -76,6 +79,7 @@ type StepShiftRight<T extends Program> = {
 type StepShiftLeft<T extends Program> = {
     halt: T['instrRight'] extends '' ? true : false
     mode: 'regular'
+    stack: ''
 
     instrLeft: `${T['instrLeft']}${T['instr']}`
     instr: First<T['instrRight']>
@@ -92,6 +96,7 @@ type StepShiftLeft<T extends Program> = {
 type StepIncrement<T extends Program> = {
     halt: T['instrRight'] extends '' ? true : false
     mode: 'regular'
+    stack: ''
 
     instrLeft: `${T['instrLeft']}${T['instr']}`
     instr: First<T['instrRight']>
@@ -108,6 +113,7 @@ type StepIncrement<T extends Program> = {
 type StepDecrement<T extends Program> = {
     halt: T['instrRight'] extends '' ? true : false
     mode: 'regular'
+    stack: ''
 
     instrLeft: `${T['instrLeft']}${T['instr']}`
     instr: First<T['instrRight']>
@@ -124,6 +130,7 @@ type StepDecrement<T extends Program> = {
 type StepStdin<T extends Program> = {
     halt: T['instrRight'] extends '' ? true : false
     mode: 'regular'
+    stack: ''
 
     instrLeft: `${T['instrLeft']}${T['instr']}`
     instr: First<T['instrRight']>
@@ -140,6 +147,7 @@ type StepStdin<T extends Program> = {
 type StepStdout<T extends Program> = {
     halt: T['instrRight'] extends '' ? true : false
     mode: 'regular'
+    stack: ''
 
     instrLeft: `${T['instrLeft']}${T['instr']}`
     instr: First<T['instrRight']>
@@ -153,6 +161,58 @@ type StepStdout<T extends Program> = {
     stdout: `${T['stdout']}${T['mem']}`
 }
 
+type StepOverLoop<T extends Program> = {
+    halt: T['instrRight'] extends '' ? true : false
+    mode: First<T['instrRight']> extends ']' ? T['stack'] extends '' ? 'regular' : 'stepOverLoop' : 'stepOverLoop'
+    stack: First<T['instrRight']> extends '[' ? `${T['stack']}+`
+        : First<T['instrRight']> extends ']' ? RemoveLast<T['stack']> : T['stack']
+
+    instrLeft: `${T['instrLeft']}${T['instr']}`
+    instr: First<T['instrRight']>
+    instrRight: RemoveFirst<T['instrRight']>
+
+    memLeft: T['memLeft']
+    mem: T['mem']
+    memRight: T['memRight']
+
+    stdin: T['stdin']
+    stdout: T['stdout']
+}
+
+type StepJumpToLoopStart<T extends Program> = {
+    halt: T['instrRight'] extends '' ? true : false
+    mode: 'jumpToLoop'
+    stack: ''
+
+    instrLeft: RemoveLast<T['instrLeft']>
+    instr: Last<T['instrLeft']>
+    instrRight: `${T['instr']}${T['instrRight']}`
+
+    memLeft: T['memLeft']
+    mem: T['mem']
+    memRight: T['memRight']
+
+    stdin: T['stdin']
+    stdout: T['stdout']
+}
+
+type StepNop<T extends Program> = {
+    halt: T['instrRight'] extends '' ? true : false
+    mode: 'regular'
+    stack: ''
+
+    instrLeft: `${T['instrLeft']}${T['instr']}`
+    instr: First<T['instrRight']>
+    instrRight: RemoveFirst<T['instrRight']>
+
+    memLeft: T['memLeft']
+    mem: T['mem']
+    memRight: T['memRight']
+
+    stdin: T['stdin']
+    stdout: T['stdout']
+}
+
 type StepRegular<T extends Program> =
     T['instr'] extends '>' ? StepShiftRight<T>
     : T['instr'] extends '<' ? StepShiftLeft<T>
@@ -160,14 +220,13 @@ type StepRegular<T extends Program> =
     : T['instr'] extends '-' ? StepDecrement<T>
     : T['instr'] extends ',' ? StepStdin<T>
     : T['instr'] extends '.' ? StepStdout<T>
+    : T['instr'] extends '[' ? T['mem'] extends '\u0000' ? StepOverLoop<T> : StepNop<T>
+    : T['instr'] extends ']' ? T['mem'] extends '\u0000' ? StepNop<T> : StepJumpToLoopStart<T>
     : null
 
-type StepLoopForward<T extends Program, TStack extends string> = T
-type StepLoopBackward<T extends Program, TStack extends string> = T
-
 type Step<T extends Program> =
-    T['mode'] extends 'loopForward' ? StepLoopForward<T, ''>
-    : T['mode'] extends 'loopForward' ? StepLoopBackward<T, ''>
+    T['mode'] extends 'stepOverLoop' ? StepOverLoop<T>
+    : T['mode'] extends 'jumpToLoop' ? StepJumpToLoopStart<T>
     : StepRegular<T>
 
 export type RunToEnd<T extends Program> = T['halt'] extends true
