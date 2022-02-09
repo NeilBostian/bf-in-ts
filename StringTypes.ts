@@ -18,6 +18,8 @@ type Null16 = `${Null8}${Null8}`
 type Null32 = `${Null16}${Null16}`
 type Null64 = `${Null32}${Null32}`
 type Null128 = `${Null64}${Null64}`
+type Null256 = `${Null128}${Null128}`
+type Null512 = `${Null256}${Null256}`
 
 export type StripTrailingNullChars<T extends string> = T extends '' ? ''
   : T extends `${infer U}${Null128}` ? StripTrailingNullChars<U>
@@ -39,6 +41,7 @@ const testRemoveFirst1: RemoveFirst<''> = ''
 const testRemoveFirst2: RemoveFirst<'A'> = ''
 const testRemoveFirst3: RemoveFirst<'ABC'> = 'BC'
 const testRemoveFirst4: RemoveFirst<'123'> = '23'
+const testRemoveFirst5: RemoveFirst<'abcdefghijklmnopqrstuvwxyz123456789abcdefghijklmnopqrstuvwxyz123456789'> = 'bcdefghijklmnopqrstuvwxyz123456789abcdefghijklmnopqrstuvwxyz123456789'
 
 const testReverse1: Reverse<''> = ''
 const testReverse2: Reverse<'A'> = 'A'
@@ -54,6 +57,15 @@ const testRemoveLast1: RemoveLast<''> = ''
 const testRemoveLast2: RemoveLast<'A'> = ''
 const testRemoveLast3: RemoveLast<'ABC'> = 'AB'
 const testRemoveLast4: RemoveLast<'123'> = '12'
+
+let testRemoveNull4: RemoveLast<Null4>
+let testRemoveNull8: RemoveLast<Null8>
+let testRemoveNull16: RemoveLast<Null16>
+let testRemoveNull32: RemoveLast<Null32>
+let testRemoveNull64: RemoveLast<Null64>
+let testRemoveNull128: RemoveLast<Null128>
+let testRemoveNull256: RemoveLast<Null256>
+let testRemoveNull512: RemoveLast<Null512>
 
 const testStripNullChars1: StripTrailingNullChars<''> = ''
 const testStripNullChars2: StripTrailingNullChars<'A\0\0'> = 'A'
