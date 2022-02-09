@@ -11,7 +11,7 @@ import {
     Last,
     RemoveFirst,
     RemoveLast,
-    StripNullChars
+    StripTrailingNullChars
 } from './StringTypes'
 
 interface Program {
@@ -46,7 +46,7 @@ export type BfProgram<
     instr: First<TBfCode>
     instrRight: RemoveFirst<TBfCode>
     memLeft: ''
-    mem: '\u0000'
+    mem: '\0'
     memRight: EmptyMem
     stdin: TStdin
     stdout: ''
@@ -55,7 +55,7 @@ export type BfProgram<
 export type ProgramSummary<T extends CompletedProgram> = {
     program: `${T['instrLeft']}${T['instr']}${T['instrRight']}`
     memory: `${T['memLeft']}${T['mem']}${T['memRight']}`
-    setMemory: StripNullChars<`${T['memLeft']}${T['mem']}${T['memRight']}`>
+    setMemory: StripTrailingNullChars<`${T['memLeft']}${T['mem']}${T['memRight']}`>
     stdout: T['stdout']
 }
 
@@ -181,8 +181,9 @@ type StepOverLoop<T extends Program> = {
 
 type StepJumpToLoopStart<T extends Program> = {
     halt: T['instrRight'] extends '' ? true : false
-    mode: 'jumpToLoop'
-    stack: ''
+    mode: Last<T['instrLeft']> extends '[' ? T['stack'] extends '' ? 'regular' : 'jumpToLoop' : 'jumpToLoop'
+    stack: Last<T['instrLeft']> extends ']' ? `${T['stack']}+`
+        : Last<T['instrLeft']> extends '[' ? RemoveLast<T['stack']> : T['stack']
 
     instrLeft: RemoveLast<T['instrLeft']>
     instr: Last<T['instrLeft']>
@@ -220,8 +221,8 @@ type StepRegular<T extends Program> =
     : T['instr'] extends '-' ? StepDecrement<T>
     : T['instr'] extends ',' ? StepStdin<T>
     : T['instr'] extends '.' ? StepStdout<T>
-    : T['instr'] extends '[' ? T['mem'] extends '\u0000' ? StepOverLoop<T> : StepNop<T>
-    : T['instr'] extends ']' ? T['mem'] extends '\u0000' ? StepNop<T> : StepJumpToLoopStart<T>
+    : T['instr'] extends '[' ? T['mem'] extends '\0' ? StepOverLoop<T> : StepNop<T>
+    : T['instr'] extends ']' ? T['mem'] extends '\0' ? StepNop<T> : StepJumpToLoopStart<T>
     : null
 
 type Step<T extends Program> =
