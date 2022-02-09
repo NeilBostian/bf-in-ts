@@ -1,17 +1,21 @@
-const { exec } = require('child_process')
+const fs = require('fs')
+const util = require("util");
+const exec = util.promisify(require("child_process").exec);
 
-function runTest(fileName) {
-    exec('npx tsc --noEmit ' + fileName, (err, stdout, stderr) => {
-        if (err)
-            console.log(err);
+async function runTest(fileName) {
+  console.log("Run test " + fileName);
 
-        if (stdout)
-            console.log(`stdout: ${stdout}`);
-
-        if (stderr)
-            console.log(`stderr: ${stderr}`);
-    });
+  const { stdout, stderr } = await exec("npx tsc --noEmit tests/" + fileName);
+  if (stdout) console.log(`stdout: ${stdout}`);
+  if (stderr) console.log(`stderr: ${stderr}`);
 }
 
-runTest('tests/TestIncDecShift.ts');
-runTest('tests/TestStdio.ts');
+fs.readdir("tests", async (err, files) => {
+  if (err) {
+    throw err;
+  }
+
+  for (const i in files) {
+      await runTest(files[i])
+  }
+});
